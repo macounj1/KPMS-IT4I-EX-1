@@ -5,7 +5,7 @@
 #PBS -e rf_cv.e
 #PBS -o rf_cv.o
 
-cd ~/KPMS-IT4I-EX/code
+cd ~/KPMS-IT4I-EX-1/code
 pwd
 
 module load R
