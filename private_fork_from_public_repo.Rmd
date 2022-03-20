@@ -1,0 +1,46 @@
+The correct way of creating a private fork by duplicating the repo is documented here. Suppose the repository you wish to private fork is KPMS-IT4I-EX.
+
+Create a bare clone of the repository. (This is temporary and will be removed so just do it wherever.)
+```{sh eval=FALSE}
+git clone --bare https://github.com/RBigData/KPMS-IT4I-EX.git
+```
+Create a new private repository on your Github account and name it KPMS-IT4I-EX.
+
+Mirror-push your bare clone to your new repository.
+
+Replace <your_username> with your actual GitHub username in the url below.
+```{sh eval=FALSE}
+cd KPMS-IT4I-EX
+git push --mirror htps://github.com/<your_username>/KPMS-IT4I-EX.git
+```
+Remove the temporary local repository you created in step 1.
+```{sh eval=FALSE}
+cd ..
+rm -rf KPMS-IT4I-EX
+```
+You can now clone your private KPMS-IT4I-EX repository on your machine.
+```{sh eval=FALSE}
+cd ~/where-you-want-the-repostory
+git clone https://github.com/<your_username>/KPMS-IT4I-EX.git
+```
+Add the original repo as remote to fetch (potential) future changes. Make sure you also disable push on the remote (as you are not allowed to push to it anyway).
+```{sh eval=FALSE}
+git remote add upstream https://github.com/RBigData/KPMS-IT4I-EX.git
+git remote set-url --push upstream DISABLE
+```
+You can list all your remotes with `git remote -v`. You should see:
+```{sh eval=FALSE}
+origin	https://github.com/<your_username>/KPMS-IT4I-EX.git (fetch)
+origin	https://github.com/<your_username>/KPMS-IT4I-EX.git (push)
+upstream	https://github.com/RBigData/KPMS-IT4I-EX.git (fetch)
+upstream	DISABLE (push)
+```
+When you push, do so on origin with git push origin.
+
+When you want to pull changes from upstream you can fetch the remote and rebase on top of your work.
+```{sh eval=FALSE}
+git fetch upstream
+git rebase upstream/master
+```
+And solve the conflicts if any.
+
