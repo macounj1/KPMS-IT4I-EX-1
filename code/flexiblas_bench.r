@@ -9,7 +9,7 @@ data = as.data.frame(cbind(y, x))
 names(data) = c("y", paste0("x", 1:ncol(x)))
 
 elo = 0
-ehi = 7
+ehi = 7 
 
 # lm --------------------------------------
 setback("NETLIB", "lm")

@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 *.html
+*/Rplots.pdf
+*/.DS_Store

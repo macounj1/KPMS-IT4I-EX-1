@@ -9,7 +9,7 @@ i_test = sample.int(n, n_test)
 train = LetterRecognition[-i_test, ]
 test = LetterRecognition[i_test, ]
 
-nc = as.numeric(commandArgs(TRUE)[1])
+nc = as.numeric(commandArgs(TRUE)[2])
 ntree = lapply(splitIndices(500, nc), length)
 rf = function(x) randomForest(lettr ~ ., train, ntree=x, norm.votes = FALSE)
 rf.out = mclapply(ntree, rf, mc.cores = nc)

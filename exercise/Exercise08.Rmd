@@ -1,0 +1,55 @@
+---
+title: "Exercise 8"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Use crossvalidation and MPI parallelism to optimize `pct` in `mnist/mnist_svd_mv.R`
+
+`pct` is the parameter that controls the percentage of variability captured by the SVD basis functions for each image kind. Currently, this is set at 95% and the resulting test data classification error is a little under 9% (proportion correct 0.9121).
+
+The random forest code runs an error rate under 3% on the MNIST data (see updated `mnist/mnist_rf.R` and `mnist/mnist_rf.sh`). Can we optimize the SVD model to get close?
+
+The crossvalidation should be done on the `svdmod()` function call by dividing the *train* data into 10 random folds, training on 9 folds and predicting (with `predict_svdmod()`) the fold left out, just like we did in the `rf_cv_mc.r` code. Find the optimum among `pct = seq(85, 95, 0.2)` values. This gives 1000 independent computations for parallel treatment. 
+
+I will have more direction later but at first, limit your MPI computation to 2 nodes. We will discuss more MPI concepts and examples in the March 6 Lecture 8.
+
+Due date is Thursday, April 21 (AoE). As last time, each group name your R code in your ASwR repository as EX8.R and its shell script as EX8.sh. Email me at *gostrouc@utk.edu* which repository represents your group.
+
+#### Notes:
+
+A crossvalidation code with mclapply was added: `mpi/mnist_svd_cv.R` and its qsub script `mpi/mnist_svd_cv.sh`. This should be helpful for developing an MPI version. In fact, none of the `function()` definitions need to change. This mclapply crossvalidation runs about 10 minutes on one node of Karolina.
+
+**Some advice for developing the MPI version:**
+
+* All copies of an MPI SPMD code run asynchronously, cooperating via communication (usually collectives).  
+* We are reading all the data on every MPI rank. This means that at most about 32 MPI ranks can run on one node before running out of memory.  
+* The -qexp queue is limited to 2 nodes, so you can get at most 64 MPI ranks.  
+* If you keep mclapply in the code (as opposed to just apply), remember to scale back its core use so that cores are not over subscribed. Each rank will use that many cores.  
+* Using MPI together with mclapply (fork) requires these two lines in your submission script (also present in `hello_world_pbs.sh`):  
+   * `export OMPI_MCA_mpi_warn_on_fork=0`  
+   * `export RDMAV_FORK_SAFE=1`  
+* The following line is not necessary, but it avoids a warning message if used:  
+   * `module swap libfabric/1.12.1-GCCcore-10.3.0 libfabric/1.13.2-GCCcore-11.2.0`  
+* Check out the short codes in `mpi_scripts`, in particular:  
+   * The `gather*.r` codes  
+   * `chunk.r` code  
+   * Run these short scripts with `mpirun -np 3 Rscript short-code.r` on the login node after you `module load R`
+* If you are plotting, only one rank should do it for a given output file. That is, put the plot inside `if(comm.rank() == #) { your plot code}`. 
+   
+**Debugging Tips:**  
+
+* Run smaller instances while debugging. For example:  
+    * `folds = 2`  
+    * `pars = seq(80, 95, 5)`  
+* Print comments to know how far each rank code gets:  
+    * `cat(comm.rank(), "Just before function X", "\n")`  
+* Print variable values for all ranks (if not too large):  
+    * `comm.cat("var1", var1, "\n", all.rank = TRUE)`  
+    * `comm.print(object1, all.rank = TRUE)`  
+* Print variable properties:  
+    * `comm.cat("class(var1)", class(var1), "\n")`  
+    * `comm.cat("dim(var1)", dim(var1), "\n")`  
+* Remove prints in a section that runs fine so you don't get overwhelmed with output.

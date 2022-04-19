@@ -9,7 +9,7 @@ y = x %*% beta + err
 data = as.data.frame(cbind(y, x))
 names(data) = c("y", paste0("x", 1:ncol(x)))
 
-elo = 3
+elo = 2
 ehi = 7
 
 setback("OPENBLAS")
