@@ -98,8 +98,8 @@ setthreads(blas_threads)
 
 ## Begin CV (This CV is with mclapply. Exercise 8 needs MPI parallelization.)
 ## set up cv parameters
-nfolds = 10
-pars = seq(80.0, 95, .2)      ## par values to fit
+nfolds = 2
+pars = seq(80.0, 95, 5)      ## par values to fit
 folds = sample( rep_len(1:nfolds, nrow(train)), nrow(train) ) ## random folds
 cv = expand.grid(par = pars, fold = 1:nfolds)  ## all combinations
 
