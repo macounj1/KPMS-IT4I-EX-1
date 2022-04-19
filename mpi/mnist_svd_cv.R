@@ -147,7 +147,7 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
-cv_err = apply(1:nrow(cv), fold_err, cv = cv, folds = folds, train = train)
+cv_err = apply(1:nrow(cv),1, fold_err, cv = cv, folds = folds, train = train)
 
 ## sum fold errors for each parameter value
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
@@ -159,7 +159,7 @@ if(comm.rank() == 0) { pdf("Crossvalidation0.pdf")
          aes(pct, error)) + geom_point() + geom_smooth() +
     labs(title = "Loess smooth with 95% CI of crossvalidation")
   dev.off()}
-
+finalize()
 ## End CV
 
 ## recompute with optimal pct
