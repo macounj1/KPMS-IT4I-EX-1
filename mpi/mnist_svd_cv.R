@@ -147,19 +147,20 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
-
-cv_err = mcapply(1:nrow(cv), fold_err, cv = cv, folds = folds, train = train)
+cv_err = mclapply(1:nrow(cv), fold_err, cv = cv, folds = folds, train = train)
 
 ## sum fold errors for each parameter value
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
 ## plot cv curve with loess smoothing (ggplot default)
 
-if(comm.rank() == 0) { pdf("Crossvalidation0.pdf")
-  ggplot(data.frame(pct = pars, error = cv_err_par/nrow(train)), 
-         aes(pct, error)) + geom_point() + geom_smooth() +
-    labs(title = "Loess smooth with 95% CI of crossvalidation")
-  dev.off()}
+if(comm.rank() == 0) { pdf("Crossvalidation.pdf")
+   ggplot(data.frame(pct = pars, error = cv_err_par/nrow(train)), 
+          aes(pct, error)) + geom_point() + geom_smooth() +
+   labs(title = "Loess smooth with 95% CI of crossvalidation")
+   dev.off()}
+
+
 finalize()
 ## End CV
 
