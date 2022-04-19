@@ -5,7 +5,7 @@
 #PBS -e mnist_rf.e
 #PBS -o mnist_rf.o
 
-cd ~/KPMS-IT4I-EX-1/mnist
+cd ~/KPMS-IT4I-EX/mnist
 pwd
 
 module load R
