@@ -147,7 +147,7 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
-cv_err = apply(1:nrow(cv),1, fold_err, cv = cv, folds = folds, train = train)
+cv_err = apply(1:nrow(cv),2, fold_err, cv = cv, folds = folds, train = train)
 
 ## sum fold errors for each parameter value
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
