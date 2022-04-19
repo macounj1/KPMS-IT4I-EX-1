@@ -1,6 +1,7 @@
 
 source("mnist_read.R")
-
+install.packages("BiocManager")
+BiocManager::install("rhdf5")
 library(parallel)
 library(randomForest)
 set.seed(seed = 123, "L'Ecuyer-CMRG")
