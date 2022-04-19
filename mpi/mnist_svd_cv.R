@@ -99,7 +99,7 @@ setthreads(blas_threads)
 ## Begin CV (This CV is with mclapply. Exercise 8 needs MPI parallelization.)
 ## set up cv parameters
 nfolds = 2
-pars = seq(80.0, 95, 5)      ## par values to fit
+pars =comm.chunk(length(seq(80.0, 95, 5)) )     ## par values to fit
 folds = sample( rep_len(1:nfolds, nrow(train)), nrow(train) ) ## random folds
 cv = expand.grid(par = pars, fold = 1:nfolds)  ## all combinations
 
@@ -147,18 +147,19 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
-cv_err = mclapply(1:nrow(cv), fold_err, cv = cv, folds = folds, train = train,
-                  mc.cores = fork_cores)
+cv_err = apply(1:nrow(cv), fold_err, cv = cv, folds = folds, train = train)
 
 ## sum fold errors for each parameter value
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
 ## plot cv curve with loess smoothing (ggplot default)
-pdf("Crossvalidation.pdf")
+
+if(comm.rank() == 0) { pdf("Crossvalidation0.pdf")
   ggplot(data.frame(pct = pars, error = cv_err_par/nrow(train)), 
          aes(pct, error)) + geom_point() + geom_smooth() +
     labs(title = "Loess smooth with 95% CI of crossvalidation")
-dev.off()
+  dev.off()}
+
 ## End CV
 
 ## recompute with optimal pct
