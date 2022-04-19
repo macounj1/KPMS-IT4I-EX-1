@@ -99,7 +99,7 @@ setthreads(blas_threads)
 ## Begin CV (This CV is with mclapply. Exercise 8 needs MPI parallelization.)
 ## set up cv parameters
 nfolds = 2
-pars =comm.chunk(length(seq(80.0, 95, 5)) )     ## par values to fit
+pars = seq(80.0, 95, 5)      ## par values to fit
 folds = sample( rep_len(1:nfolds, nrow(train)), nrow(train) ) ## random folds
 cv = expand.grid(par = pars, fold = 1:nfolds)  ## all combinations
 
@@ -107,23 +107,6 @@ cv = expand.grid(par = pars, fold = 1:nfolds)  ## all combinations
 #------------------------------------------------------------------------
 #jara zkousi programovat cv
 
-#comm.set.seed(seed = 123, diff = TRUE)
-
-#n = nrow(train)
-#n_test = nrow(test)
-#my_trees = comm.chunk(512)
-#my_test_rows = comm.chunk(nrow(test), form = "vector")
-
-#my_rf = randomForest(train, y = train_lab, ntree = my_trees, norm.votes = FALSE)
-#all_rf = allgather(my_rf)
-#all_rf = do.call(combine, all_rf)
-
-#my_pred = as.vector(predict(all_rf, test[my_test_rows, ]))
-
-#correct = reduce(sum(my_pred == test_lab[my_test_rows]))
-#comm.cat("Proportion Correct:", correct/n_test, "\n")
-
-#finalize()
 
 
 
@@ -134,7 +117,7 @@ cv = expand.grid(par = pars, fold = 1:nfolds)  ## all combinations
 
 
 
-#-----------------------------------------------------------------------
+#-------------------------------------------------------------------------
 
 
 ## function for parameter combination i
@@ -147,21 +130,18 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
-cv_err = mclapply(1:nrow(cv), fold_err, cv = cv, folds = folds, train = train)
+cv_err = mclapply(1:nrow(cv), fold_err, cv = cv, folds = folds, train = train,
+                  mc.cores = fork_cores)
 
 ## sum fold errors for each parameter value
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
 ## plot cv curve with loess smoothing (ggplot default)
-
-if(comm.rank() == 0) { pdf("Crossvalidation.pdf")
-   ggplot(data.frame(pct = pars, error = cv_err_par/nrow(train)), 
-          aes(pct, error)) + geom_point() + geom_smooth() +
-   labs(title = "Loess smooth with 95% CI of crossvalidation")
-   dev.off()}
-
-
-finalize()
+pdf("Crossvalidation.pdf")
+  ggplot(data.frame(pct = pars, error = cv_err_par/nrow(train)), 
+         aes(pct, error)) + geom_point() + geom_smooth() +
+    labs(title = "Loess smooth with 95% CI of crossvalidation")
+dev.off()
 ## End CV
 
 ## recompute with optimal pct
