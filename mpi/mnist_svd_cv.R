@@ -170,10 +170,10 @@ indexes_pars <- unlist(allgather(index_pars))
 cv_err_par_colect <- unlist(allgather(cv_err_par))
 ## plot cv curve with loess smoothing (ggplot default)
 
-   pdf("Crossvalidation.pdf")
+if(comm.rank() == 1) {pdf("Crossvalidation.pdf")
    
    
-   if(comm.rank() == 1) {ggplot(data.frame(pct = pars[indexes_pars], error = cv_err_par_colect/nrow(train)), 
+   ggplot(data.frame(pct = pars[indexes_pars], error = cv_err_par_colect/nrow(train)), 
           aes(pct, error)) + geom_point() + geom_smooth() +
    labs(title = "Loess smooth with 95% CI of crossvalidation")
    dev.off()}
