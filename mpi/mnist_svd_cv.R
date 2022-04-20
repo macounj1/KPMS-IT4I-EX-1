@@ -176,11 +176,12 @@ dev.off()
 ## End CV
 
 ## recompute with optimal pct
-models = svdmod(train, train_lab, pct = 85)
+if(comm.rank() == 0) { models = svdmod(train, train_lab, pct = 85)
 pdf("BasisImages.pdf")
-  model_report(models, kplot = 9)
+model_report(models, kplot = 9)
 dev.off()
 predicts = predict_svdmod(test, models)
 correct <- sum(predicts == test_lab)
-cat("Proportion Correct:", correct/nrow(test), "\n")
+cat("Proportion Correct:", correct/nrow(test), "\n")}
+
 finalize()
