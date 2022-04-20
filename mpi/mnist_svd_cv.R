@@ -163,7 +163,7 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
-comm.print(cv[my_index])
+
 
 
 
