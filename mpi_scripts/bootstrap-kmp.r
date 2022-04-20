@@ -10,7 +10,7 @@ FUN <- function( n ) {
 my.means <- do.call( rbind, lapply( get.jid( 5000 ), FUN ) )
 means <- gather( my.means )
 
-if( comm.rank( ) == 1 ){
+if( comm.rank( ) == 0 ){
   means <- do.call( rbind, means )
   pdf( "means.pdf" )
     plot( X[ , c(1, 2) ], type = "n" )
