@@ -176,7 +176,8 @@ if(comm.rank() == 0) { pdf("Crossvalidation.pdf")
           aes(pct, error)) + geom_point() + geom_smooth() +
    labs(title = "Loess smooth with 95% CI of crossvalidation")
    dev.off()}
-
+comm.print(pars[indexes_pars])
+comm.print(cv_err_par_colect)
 ## End CV
 
 ## recompute with optimal pct
