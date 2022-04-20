@@ -160,7 +160,7 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
-comm.print(cv)
+comm.print(cv, all.rank = TRUE)
 
 d=as.array(1:nrow(cv))
 cv_err = apply(d, 1,fold_err, cv = cv, folds = folds, train = train)
