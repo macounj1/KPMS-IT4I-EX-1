@@ -103,7 +103,8 @@ my.rank <- comm.rank()
 nfolds = 2
 pars = seq(80.0, 95, 5) ## par values to fit
 index_pars=comm.chunk(length( seq(80.0, 95, 5)), form = "vector")
-comm.cat( my.rank, ":", index_pars, "\n")
+comm.cat( index_pars,"indexpars", "\n")
+comm.cat( my.rank, "myrank","\n")
 
 
 folds = sample( rep_len(1:nfolds, nrow(train)), nrow(train) ) ## random folds
@@ -151,7 +152,7 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
-comm.print(cv,"rank:",my.rank,all.rank = TRUE, quiet = TRUE)
+comm.cat(cv,"rank:",my.rank)
 d=as.array(1:nrow(cv))
 cv_err = apply(d, 1,fold_err, cv = cv, folds = folds, train = train)
 
