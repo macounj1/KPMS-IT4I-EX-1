@@ -98,9 +98,12 @@ setthreads(blas_threads)
 
 ## Begin CV (This CV is with mclapply. Exercise 8 needs MPI parallelization.)
 ## set up cv parameters
+my.rank <- comm.rank()
+
 nfolds = 4
 pars = seq(80.0, 95, 5) ## par values to fit
 index_pars=comm.chunk(length( seq(80.0, 95, 5)), form = "vector")
+comm.cat( my.rank, ":", index_pars, "\n")
 
 
 folds = sample( rep_len(1:nfolds, nrow(train)), nrow(train) ) ## random folds
