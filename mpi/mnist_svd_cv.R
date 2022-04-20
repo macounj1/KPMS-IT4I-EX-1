@@ -163,12 +163,13 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
+comm.print(my_index)
 
-
+d=as.array(my_index)
 
 
 comm.print("preslo to pred apply",my.rank,all.rank = TRUE)
-cv_err = apply(my_index, 1,fold_err, cv = cv, folds = folds, train = train)
+cv_err = apply(d, 1,fold_err, cv = cv, folds = folds, train = train)
 comm.print("preslo to za apply",my.rank,all.rank = TRUE)
 
 
