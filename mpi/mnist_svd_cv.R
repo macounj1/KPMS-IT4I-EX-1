@@ -102,9 +102,9 @@ source("../mnist/mnist_read.R")
 ## set up cv parameters
 
 
-nfolds = 2
-pars = seq(80.0, 95, 5) ## par values to fit
-index_pars=comm.chunk(length( seq(80.0, 95, 5)), form = "vector")
+nfolds = 10
+pars = seq(80.0, 95, 2) ## par values to fit
+index_pars=comm.chunk(length( seq(80.0, 95, 2)), form = "vector")
 comm.cat( index_pars,"indexpars", "\n",all.rank=TRUE)
 my.rank <- comm.rank()
 
@@ -119,7 +119,7 @@ ranks = comm.size()
 #cat(msg, "\n")
 
 
-k <- comm.chunk(length( seq(80.0, 95, 5)))
+k <- comm.chunk(length( seq(80.0, 95, 2)))
 
 #------------------------------------------------------------------------
 #jara zkousi programovat cv
@@ -174,11 +174,11 @@ cv_err_par_colect <- unlist(allgather(cv_err_par))
 ## plot cv curve with loess smoothing (ggplot default)
 
 
-  pdf("Crossvalidation.pdf")
+if(comm.rank() == 1) { pdf("Crossvalidation.pdf")
    ggplot(data.frame(pct = pars[indexes_pars], error = cv_err_par_colect/nrow(train)), 
           aes(pct, error)) + geom_point() + geom_smooth() +
    labs(title = "Loess smooth with 95% CI of crossvalidation")
-   dev.off()
+   dev.off()}
 
 
 comm.print(pars[indexes_pars])
