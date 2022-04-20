@@ -102,7 +102,7 @@ suppressMessages(library(pbdMPI))
 nfolds = 2
 pars = seq(80.0, 95, 5) ## par values to fit
 index_pars=comm.chunk(length( seq(80.0, 95, 5)), form = "vector")
-comm.cat( index_pars,"indexpars", "\n")
+comm.cat( index_pars,"indexpars", "\n",all.rank=TRUE)
 my.rank <- comm.rank()
 
 
