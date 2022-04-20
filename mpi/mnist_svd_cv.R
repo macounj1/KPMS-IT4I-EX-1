@@ -103,8 +103,8 @@ source("../mnist/mnist_read.R")
 
 
 nfolds = 10
-pars = seq(80.0, 95, 2) ## par values to fit
-index_pars=comm.chunk(length( seq(80.0, 95, 2)), form = "vector")
+pars = seq(80.0, 95, 0.2) ## par values to fit
+index_pars=comm.chunk(length( seq(80.0, 95, 0.2)), form = "vector")
 comm.cat( index_pars,"indexpars", "\n",all.rank=TRUE)
 my.rank <- comm.rank()
 
@@ -166,16 +166,16 @@ comm.print(cv, all.rank = TRUE)
 
 d=as.array(1:nrow(cv))
 
-if  (!is.null(d)){
-cv_err = apply(d, 1,fold_err, cv = cv, folds = folds, train = train)}else
-{cv_err=NULL}
+
+cv_err = apply(d, 1,fold_err, cv = cv, folds = folds, train = train)
+
 
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
 indexes_pars <- unlist(allgather(index_pars))
 cv_err_par_colect <- unlist(allgather(cv_err_par))
 ## plot cv curve with loess smoothing (ggplot default)
-
+comm.print(pars[indexes_pars])
 
 if(comm.rank() == 1) { pdf("Crossvalidation.pdf")
    ggplot(data.frame(pct = pars[indexes_pars], error = cv_err_par_colect/nrow(train)), 
@@ -184,7 +184,7 @@ if(comm.rank() == 1) { pdf("Crossvalidation.pdf")
    dev.off()}
 
 
-comm.print(pars[indexes_pars])
+
 comm.print(cv_err_par_colect)
 ## End CV
 
