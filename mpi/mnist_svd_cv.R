@@ -93,7 +93,7 @@ source("../mnist/mnist_read.R")
 suppressMessages(library(pbdIO))
 suppressMessages(library(pbdMPI))
 
-setthreads(blas_threads)
+
 
 ## Begin CV (This CV is with mclapply. Exercise 8 needs MPI parallelization.)
 ## set up cv parameters
