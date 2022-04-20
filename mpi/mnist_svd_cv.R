@@ -160,7 +160,7 @@ pdf("Crossvalidation.pdf")
     labs(title = "Loess smooth with 95% CI of crossvalidation")
 dev.off()
 ## End CV
-
+finalize()
 ## recompute with optimal pct
 models = svdmod(train, train_lab, pct = 85)
 pdf("BasisImages.pdf")
