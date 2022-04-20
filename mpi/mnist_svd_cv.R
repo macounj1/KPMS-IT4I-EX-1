@@ -100,7 +100,7 @@ setthreads(blas_threads)
 ## set up cv parameters
 my.rank <- comm.rank()
 
-nfolds = 4
+nfolds = 2
 pars = seq(80.0, 95, 5) ## par values to fit
 index_pars=comm.chunk(length( seq(80.0, 95, 5)), form = "vector")
 comm.cat( my.rank, ":", index_pars, "\n")
@@ -151,7 +151,7 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
-comm.print(cv)
+comm.print(cv,"rank:",my.rank,all.rank = TRUE, quiet = TRUE)
 d=as.array(1:nrow(cv))
 cv_err = apply(d, 1,fold_err, cv = cv, folds = folds, train = train)
 
