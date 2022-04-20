@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N mnist_svd_cv
-#PBS -l select=1:mpiprocs=8,walltime=00:50:00
+#PBS -l select=2:mpiprocs=128,walltime=00:50:00
 #PBS -q qexp
 #PBS -e mnist_svd_cv.e
 #PBS -o mnist_svd_cv.o
@@ -17,4 +17,4 @@ module swap libfabric/1.12.1-GCCcore-10.3.0 libfabric/1.13.2-GCCcore-11.2.0
 ## --args blas fork
 
 
-time mpirun  -np 8 Rscript mnist_svd_cv.R
+timempirun --map-by ppr:32:node Rscript mnist_svd_cv.R
