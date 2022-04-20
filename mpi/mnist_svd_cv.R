@@ -86,12 +86,15 @@ model_report = function(models, kplot = 0) {
   }
 }
 
+
+
+suppressMessages(library(pbdIO))
+suppressMessages(library(pbdMPI))
 library(parallel)
 library(ggplot2)
 source("../mnist/mnist_read.R")
 
-suppressMessages(library(pbdIO))
-suppressMessages(library(pbdMPI))
+
 
 
 
@@ -170,13 +173,14 @@ indexes_pars <- unlist(allgather(index_pars))
 cv_err_par_colect <- unlist(allgather(cv_err_par))
 ## plot cv curve with loess smoothing (ggplot default)
 
-if(comm.rank() == 1) {pdf("Crossvalidation.pdf")
-   
-   
+if(comm.rank() == 1) {
+  pdf("Crossvalidation.pdf")
    ggplot(data.frame(pct = pars[indexes_pars], error = cv_err_par_colect/nrow(train)), 
           aes(pct, error)) + geom_point() + geom_smooth() +
    labs(title = "Loess smooth with 95% CI of crossvalidation")
    dev.off()}
+
+
 comm.print(pars[indexes_pars])
 comm.print(cv_err_par_colect)
 ## End CV
