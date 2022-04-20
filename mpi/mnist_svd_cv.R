@@ -117,7 +117,7 @@ ranks = comm.size()
 
 
 k <- comm.chunk(length( seq(80.0, 95, 5)))
-comm.cat( my.rank, ":", k, "\n", all.rank = TRUE)
+comm.cat( my.rank, "my rank is:", k, "\n", all.rank = TRUE)
 
 #------------------------------------------------------------------------
 #jara zkousi programovat cv
