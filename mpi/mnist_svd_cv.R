@@ -104,12 +104,17 @@ nfolds = 2
 pars = seq(80.0, 95, 5) ## par values to fit
 index_pars=comm.chunk(length( seq(80.0, 95, 5)), form = "vector")
 comm.cat( index_pars,"indexpars", "\n")
+my.rank <- comm.rank()
 
 
 
 folds = sample( rep_len(1:nfolds, nrow(train)), nrow(train) ) ## random folds
 cv = expand.grid(par = pars[index_pars], fold = 1:nfolds)  ## all combinations
 
+ranks = comm.size()
+msg = paste0("Hello World! My name is Empi", my.rank,
+             ". We are ", ranks, " identical siblings.")
+cat(msg, "\n")
 
 #------------------------------------------------------------------------
 #jara zkousi programovat cv
