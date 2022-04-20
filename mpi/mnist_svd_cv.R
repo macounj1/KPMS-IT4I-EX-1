@@ -167,13 +167,15 @@ cv_err = apply(d, 1,fold_err, cv = cv, folds = folds, train = train)
 
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
+indexes_pars <- unlist(gather(index_pars))
+cv_err_par_colect <- unlist(gather(cv_err_par))
 ## plot cv curve with loess smoothing (ggplot default)
 
- pdf("Crossvalidation.pdf")
-   ggplot(data.frame(pct = pars, error = cv_err_par/nrow(train)), 
+if(comm.rank() == 0) { pdf("Crossvalidation.pdf")
+   ggplot(data.frame(pct = pars[indexes_pars], error = cv_err_par_colect/nrow(train)), 
           aes(pct, error)) + geom_point() + geom_smooth() +
    labs(title = "Loess smooth with 95% CI of crossvalidation")
-   dev.off()
+   dev.off()}
 
 ## End CV
 
