@@ -99,9 +99,12 @@ setthreads(blas_threads)
 ## Begin CV (This CV is with mclapply. Exercise 8 needs MPI parallelization.)
 ## set up cv parameters
 nfolds = 4
-pars = seq(80.0, 95, 5)      ## par values to fit
+pars = seq(80.0, 95, 5) ## par values to fit
+index_pars=comm.chunk(length( seq(80.0, 95, 5)), form = "vector")
+
+
 folds = sample( rep_len(1:nfolds, nrow(train)), nrow(train) ) ## random folds
-cv = expand.grid(par = pars, fold = 1:nfolds)  ## all combinations
+cv = expand.grid(par = pars[index_pars], fold = 1:nfolds)  ## all combinations
 
 
 #------------------------------------------------------------------------
@@ -145,8 +148,8 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
-cv_err = mclapply(1:nrow(cv), fold_err, cv = cv, folds = folds, train = train,
-                  mc.cores = fork_cores)
+comm.print(cv)
+cv_err = apply(1:nrow(cv), 1,fold_err, cv = cv, folds = folds, train = train)
 
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
