@@ -98,7 +98,7 @@ setthreads(blas_threads)
 
 ## Begin CV (This CV is with mclapply. Exercise 8 needs MPI parallelization.)
 ## set up cv parameters
-nfolds = 2
+nfolds = 3
 pars = seq(80.0, 95, 5)      ## par values to fit
 folds = sample( rep_len(1:nfolds, nrow(train)), nrow(train) ) ## random folds
 cv = expand.grid(par = pars, fold = 1:nfolds)  ## all combinations
@@ -107,6 +107,21 @@ cv = expand.grid(par = pars, fold = 1:nfolds)  ## all combinations
 #------------------------------------------------------------------------
 #jara zkousi programovat cv
 
+#n = nrow(train)
+#n_test = nrow(test)
+#my_trees = comm.chunk(512)
+#my_test_rows = comm.chunk(nrow(test), form = "vector")
+
+#my_rf = randomForest(train, y = train_lab, ntree = my_trees, norm.votes = FALSE)
+#all_rf = allgather(my_rf)
+#all_rf = do.call(combine, all_rf)
+
+#my_pred = as.vector(predict(all_rf, test[my_test_rows, ]))
+
+#correct = reduce(sum(my_pred == test_lab[my_test_rows]))
+#comm.cat("Proportion Correct:", correct/n_test, "\n")
+
+#finalize()
 
 
 
@@ -133,7 +148,6 @@ fold_err = function(i, cv, folds, train) {
 cv_err = mclapply(1:nrow(cv), fold_err, cv = cv, folds = folds, train = train,
                   mc.cores = fork_cores)
 
-## sum fold errors for each parameter value
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
 ## plot cv curve with loess smoothing (ggplot default)
