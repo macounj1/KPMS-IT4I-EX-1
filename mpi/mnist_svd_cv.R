@@ -103,15 +103,16 @@ source("../mnist/mnist_read.R")
 
 
 nfolds = 10
-pars = seq(80.0, 95, 0.2) ## par values to fit
-index_pars=comm.chunk(length( seq(80.0, 95, 0.2)), form = "vector")
+pars = seq(80.0, 95, 1) ## par values to fit
+
 
 my.rank <- comm.rank()
 
 
 
 folds = sample( rep_len(1:nfolds, nrow(train)), nrow(train) ) ## random folds
-cv = expand.grid(par = pars[index_pars], fold = 1:nfolds)  ## all combinations
+cv = expand.grid(par = pars, fold = 1:nfolds)  ## all combinations
+my_index = comm.chunk(nrow(cv), form = "vector")
 
 ranks = comm.size()
 #msg = paste0("Hello World! My name is Empi", my.rank,
@@ -119,7 +120,7 @@ ranks = comm.size()
 #cat(msg, "\n")
 
 
-k <- comm.chunk(length( seq(80.0, 95, 2)))
+
 
 #------------------------------------------------------------------------
 #jara zkousi programovat cv
@@ -162,27 +163,27 @@ fold_err = function(i, cv, folds, train) {
 }
 
 ## apply fold_err() over parameter combinations
-comm.print(cv, all.rank = TRUE)
+comm.print(cv[my_index])
 
-d=as.array(1:nrow(cv))
+
 
 comm.print("preslo to pred apply",my.rank,all.rank = TRUE)
-cv_err = apply(d, 1,fold_err, cv = cv, folds = folds, train = train)
+cv_err = apply(my_index, 1,fold_err, cv = cv, folds = folds, train = train)
 comm.print("preslo to za apply",my.rank,all.rank = TRUE)
 
 
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
-indexes_pars <- unlist(allgather(index_pars))
+
 cv_err_par_colect <- unlist(allgather(cv_err_par))
 ## plot cv curve with loess smoothing (ggplot default)
-comm.print(pars[indexes_pars])
+comm.print(cv_err_par)
 
-if(comm.rank() == 1) { pdf("Crossvalidation.pdf")
-   ggplot(data.frame(pct = pars[indexes_pars], error = cv_err_par_colect/nrow(train)), 
+pdf("Crossvalidation.pdf")
+   ggplot(data.frame(pct = pars, error = cv_err_par_colect/nrow(train)), 
           aes(pct, error)) + geom_point() + geom_smooth() +
    labs(title = "Loess smooth with 95% CI of crossvalidation")
-   dev.off()}
+   dev.off()
 
 
 
