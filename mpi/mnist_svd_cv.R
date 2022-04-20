@@ -169,11 +169,11 @@ cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
 ## plot cv curve with loess smoothing (ggplot default)
 
-if(comm.rank() == 1) { pdf("Crossvalidation.pdf")
+ pdf("Crossvalidation.pdf")
    ggplot(data.frame(pct = pars, error = cv_err_par/nrow(train)), 
           aes(pct, error)) + geom_point() + geom_smooth() +
    labs(title = "Loess smooth with 95% CI of crossvalidation")
-   dev.off()}
+   dev.off()
 
 ## End CV
 
