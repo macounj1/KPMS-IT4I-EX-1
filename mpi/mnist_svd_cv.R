@@ -111,9 +111,13 @@ folds = sample( rep_len(1:nfolds, nrow(train)), nrow(train) ) ## random folds
 cv = expand.grid(par = pars[index_pars], fold = 1:nfolds)  ## all combinations
 
 ranks = comm.size()
-msg = paste0("Hello World! My name is Empi", my.rank,
-             ". We are ", ranks, " identical siblings.")
-cat(msg, "\n")
+#msg = paste0("Hello World! My name is Empi", my.rank,
+ #            ". We are ", ranks, " identical siblings.")
+#cat(msg, "\n")
+
+
+k <- comm.chunk(length( seq(80.0, 95, 5)))
+comm.cat( my.rank, ":", k, "\n", all.rank = TRUE)
 
 #------------------------------------------------------------------------
 #jara zkousi programovat cv
