@@ -1,5 +1,6 @@
 library( pbdIO, quiet = TRUE )
 
+comm.cat( comm.size() , all.rank = TRUE, quiet = TRUE)
 my.rank <- comm.rank()
 
 k <- comm.chunk( 10 )
