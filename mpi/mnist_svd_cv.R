@@ -165,7 +165,10 @@ fold_err = function(i, cv, folds, train) {
 comm.print(cv, all.rank = TRUE)
 
 d=as.array(1:nrow(cv))
-cv_err = apply(d, 1,fold_err, cv = cv, folds = folds, train = train)
+
+if  (!is.null(d)){
+cv_err = apply(d, 1,fold_err, cv = cv, folds = folds, train = train)}else
+{cv_err=NULL}
 
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
