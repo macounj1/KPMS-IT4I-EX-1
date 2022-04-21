@@ -102,8 +102,8 @@ source("../mnist/mnist_read.R")
 ## set up cv parameters
 
 
-nfolds = 5
-pars = seq(80.0, 95, 0.2) ## par values to fit
+nfolds = 2
+pars = seq(80.0, 95, 5) ## par values to fit
 
 
 my.rank <- comm.rank()
