@@ -152,7 +152,8 @@ ranks = comm.size()
 
 #-------------------------------------------------------------------------
 
-
+comm.print(cv)
+comm.print(folds)
 ## function for parameter combination i
 fold_err = function(i, cv, folds, train) {
   par = cv[i, "par"]
