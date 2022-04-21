@@ -102,8 +102,8 @@ source("../mnist/mnist_read.R")
 ## set up cv parameters
 
 
-nfolds = 10
-pars = seq(80.0, 95, 1) ## par values to fit
+nfolds = 2
+pars = seq(80.0, 95, 5) ## par values to fit
 
 
 my.rank <- comm.rank()
@@ -169,26 +169,31 @@ comm.print(my_index)
 
 
 comm.print("preslo to pred lapply",my.rank,all.rank = TRUE)
-cv_err = lapply(my_index,fold_err, cv = cv, folds = folds, train = train)
+my_cv_err = lapply(my_index,fold_err, cv = cv, folds = folds, train = train)
 comm.print("preslo to za lapply",my.rank,all.rank = TRUE)
 
 
+cv_err = allgather(my_cv_err)`  
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
 
-cv_err_par_colect <- unlist(allgather(cv_err_par))
+
+#cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
+
+
+#cv_err_par_colect <- unlist(allgather(cv_err_par))
 ## plot cv curve with loess smoothing (ggplot default)
 comm.print(cv_err_par)
 
 pdf("Crossvalidation.pdf")
-   ggplot(data.frame(pct = pars, error = cv_err_par_colect/nrow(train)), 
+   ggplot(data.frame(pct = pars, error = cv_err_par/nrow(train)), 
           aes(pct, error)) + geom_point() + geom_smooth() +
    labs(title = "Loess smooth with 95% CI of crossvalidation")
    dev.off()
 
 
 
-comm.print(cv_err_par_colect)
+comm.print(cv_err_par)
 ## End CV
 
 ## recompute with optimal pct
