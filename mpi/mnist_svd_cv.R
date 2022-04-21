@@ -103,7 +103,7 @@ source("../mnist/mnist_read.R")
 
 
 nfolds = 2
-pars = seq(80.0, 95, 5) ## par values to fit
+pars = seq(80.0, 95, 0.5) ## par values to fit
 
 
 my.rank <- comm.rank()
