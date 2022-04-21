@@ -173,7 +173,7 @@ my_cv_err = lapply(my_index,fold_err, cv = cv, folds = folds, train = train)
 comm.print("preslo to za lapply",my.rank,all.rank = TRUE)
 
 
-cv_err = allgather(my_cv_err)`  
+cv_err = allgather(my_cv_err) 
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
 
