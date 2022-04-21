@@ -102,8 +102,8 @@ source("../mnist/mnist_read.R")
 ## set up cv parameters
 
 
-nfolds = 2
-pars = seq(80.0, 95, 0.5) ## par values to fit
+nfolds = 5
+pars = seq(80.0, 95, 0.2) ## par values to fit
 
 
 my.rank <- comm.rank()
@@ -185,15 +185,15 @@ cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 ## plot cv curve with loess smoothing (ggplot default)
 comm.print(cv_err_par)
 
-if(comm.rank() == 0) {pdf("Crossvalidation.pdf")
+pdf("Crossvalidation.pdf")
    ggplot(data.frame(pct = pars, error = cv_err_par/nrow(train)), 
           aes(pct, error)) + geom_point() + geom_smooth() +
    labs(title = "Loess smooth with 95% CI of crossvalidation")
-   dev.off()}
+   dev.off()
 
 
 
-comm.print(cv_err_par)
+
 ## End CV
 
 ## recompute with optimal pct
