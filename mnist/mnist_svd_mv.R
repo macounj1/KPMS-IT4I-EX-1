@@ -98,13 +98,12 @@ library(ggplot2)
 
 
 
-
 ## Begin CV (This CV is with mclapply. Exercise 8 needs MPI parallelization.)
 ## set up cv parameters
 
 
-nfolds = 2
-pars = seq(80.0, 95, 0.5) ## par values to fit
+nfolds = 5
+pars = seq(80.0, 95, 0.2) ## par values to fit
 
 
 my.rank <- comm.rank()
@@ -174,7 +173,7 @@ my_cv_err = lapply(my_index,fold_err, cv = cv, folds = folds, train = train)
 comm.print("preslo to za lapply",my.rank,all.rank = TRUE)
 
 
-cv_err = allgather(my_cv_err)`  
+cv_err = allgather(my_cv_err) 
 cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 
 
@@ -194,11 +193,11 @@ dev.off()
 
 
 
-comm.print(cv_err_par)
+
 ## End CV
 
 ## recompute with optimal pct
-if(comm.rank() == 1) { models = svdmod(train, train_lab, pct = 85)
+if(comm.rank() == 0) { models = svdmod(train, train_lab, pct = 85)
 pdf("BasisImages.pdf")
 model_report(models, kplot = 9)
 dev.off()
