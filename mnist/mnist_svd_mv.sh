@@ -5,7 +5,7 @@
 #PBS -e mnist_svd_cv.e
 #PBS -o mnist_svd_cv.o
 
-cd ~/KPMS-IT4I-EX/mpi
+cd ~/KPMS-IT4I-EX/mnist
 pwd
 
 module load R
