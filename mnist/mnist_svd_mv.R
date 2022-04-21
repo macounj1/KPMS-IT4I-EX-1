@@ -89,10 +89,121 @@ model_report = function(models, kplot = 0) {
   }
 }
 
-setthreads(4)
-models = svdmod(train, train_lab, pct = 95)
-model_report(models, kplot = 9)
-predicts = predict_svdmod(test, models)
+suppressMessages(library(pbdIO))
+suppressMessages(library(pbdMPI))
+library(parallel)
+library(ggplot2)
 
+
+
+
+
+
+## Begin CV (This CV is with mclapply. Exercise 8 needs MPI parallelization.)
+## set up cv parameters
+
+
+nfolds = 2
+pars = seq(80.0, 95, 0.5) ## par values to fit
+
+
+my.rank <- comm.rank()
+
+
+
+folds = sample( rep_len(1:nfolds, nrow(train)), nrow(train) ) ## random folds
+cv = expand.grid(par = pars, fold = 1:nfolds)  ## all combinations
+my_index = comm.chunk(nrow(cv), form = "vector")
+
+ranks = comm.size()
+#msg = paste0("Hello World! My name is Empi", my.rank,
+#            ". We are ", ranks, " identical siblings.")
+#cat(msg, "\n")
+
+
+
+
+#------------------------------------------------------------------------
+#jara zkousi programovat cv
+
+#n = nrow(train)
+#n_test = nrow(test)
+#my_trees = comm.chunk(512)
+#my_test_rows = comm.chunk(nrow(test), form = "vector")
+
+#my_rf = randomForest(train, y = train_lab, ntree = my_trees, norm.votes = FALSE)
+#all_rf = allgather(my_rf)
+#all_rf = do.call(combine, all_rf)
+
+#my_pred = as.vector(predict(all_rf, test[my_test_rows, ]))
+
+#correct = reduce(sum(my_pred == test_lab[my_test_rows]))
+#comm.cat("Proportion Correct:", correct/n_test, "\n")
+
+#finalize()
+
+
+
+
+
+
+
+
+
+
+#-------------------------------------------------------------------------
+
+
+## function for parameter combination i
+fold_err = function(i, cv, folds, train) {
+  par = cv[i, "par"]
+  fold = (folds == cv[i, "fold"])
+  models = svdmod(train[!fold, ], train_lab[!fold], pct = par)
+  predicts = predict_svdmod(train[fold, ], models)
+  sum(predicts != train_lab[fold])
+}
+
+## apply fold_err() over parameter combinations
+comm.print(my_index)
+
+
+
+
+comm.print("preslo to pred lapply",my.rank,all.rank = TRUE)
+my_cv_err = lapply(my_index,fold_err, cv = cv, folds = folds, train = train)
+comm.print("preslo to za lapply",my.rank,all.rank = TRUE)
+
+
+cv_err = allgather(my_cv_err)`  
+cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
+
+
+
+#cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
+
+
+#cv_err_par_colect <- unlist(allgather(cv_err_par))
+## plot cv curve with loess smoothing (ggplot default)
+comm.print(cv_err_par)
+
+pdf("Crossvalidation.pdf")
+ggplot(data.frame(pct = pars, error = cv_err_par/nrow(train)), 
+       aes(pct, error)) + geom_point() + geom_smooth() +
+  labs(title = "Loess smooth with 95% CI of crossvalidation")
+dev.off()
+
+
+
+comm.print(cv_err_par)
+## End CV
+
+## recompute with optimal pct
+if(comm.rank() == 1) { models = svdmod(train, train_lab, pct = 85)
+pdf("BasisImages.pdf")
+model_report(models, kplot = 9)
+dev.off()
+predicts = predict_svdmod(test, models)
 correct <- sum(predicts == test_lab)
-cat("Proportion Correct:", correct/nrow(test), "\n")
+cat("Proportion Correct:", correct/nrow(test), "\n")}
+
+finalize()
