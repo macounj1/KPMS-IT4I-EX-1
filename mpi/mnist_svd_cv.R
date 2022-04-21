@@ -185,11 +185,11 @@ cv_err_par = tapply(unlist(cv_err), cv[, "par"], sum)
 ## plot cv curve with loess smoothing (ggplot default)
 comm.print(cv_err_par)
 
-pdf("Crossvalidation.pdf")
+if(comm.rank() == 0) {pdf("Crossvalidation.pdf")
    ggplot(data.frame(pct = pars, error = cv_err_par/nrow(train)), 
           aes(pct, error)) + geom_point() + geom_smooth() +
    labs(title = "Loess smooth with 95% CI of crossvalidation")
-   dev.off()
+   dev.off()}
 
 
 
@@ -197,7 +197,7 @@ comm.print(cv_err_par)
 ## End CV
 
 ## recompute with optimal pct
-if(comm.rank() == 1) { models = svdmod(train, train_lab, pct = 85)
+if(comm.rank() == 0) { models = svdmod(train, train_lab, pct = 85)
 pdf("BasisImages.pdf")
 model_report(models, kplot = 9)
 dev.off()
