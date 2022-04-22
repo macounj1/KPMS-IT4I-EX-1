@@ -93,6 +93,9 @@ suppressMessages(library(pbdMPI))
 library(parallel)
 library(ggplot2)
 source("../mnist/mnist_read.R")
+source("../code/flexiblas_setup.r") 
+setback("OPENBLAS")
+setthreads(1)
 
 
 
@@ -102,8 +105,8 @@ source("../mnist/mnist_read.R")
 ## set up cv parameters
 
 
-nfolds = 2
-pars = seq(80.0, 95, 5) ## par values to fit
+nfolds = 10
+pars = seq(80.0, 95, 0.2) ## par values to fit
 
 
 my.rank <- comm.rank()
@@ -169,7 +172,7 @@ comm.print(my_index)
 
 
 comm.print("preslo to pred lapply",my.rank,all.rank = TRUE)
-my_cv_err = lapply(my_index,fold_err, cv = cv, folds = folds, train = train)
+my_cv_err = mclapply(my_index,fold_err, cv = cv, folds = folds, train = train,mc.cores=4)
 comm.print("preslo to za lapply",my.rank,all.rank = TRUE)
 
 
